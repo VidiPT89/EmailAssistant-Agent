@@ -1,6 +1,7 @@
 'use client'
 
 import { useLocale } from '@/i18n/LocaleProvider'
+import { useTheme } from '@/theme/ThemeProvider'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -8,33 +9,34 @@ import type { ReactNode } from 'react'
 
 export function SiteChrome({ children }: { children: ReactNode }) {
   const { t, locale, setLocale } = useLocale()
+  const { theme, setTheme } = useTheme()
   const pathname = usePathname()
   const onInbox = pathname === '/inbox'
 
   return (
     <div className="relative z-10 min-h-dvh">
       <header className="sticky top-4 z-20 mx-auto w-[min(1280px,calc(100%-1.5rem))]">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-full border border-[#f4e6c8]/12 bg-black/70 px-4 py-2 backdrop-blur-md">
-          <Link href="/" className="display text-xl tracking-[0.28em] text-[#ffaa00]">
+        <div className="chrome flex flex-wrap items-center justify-between gap-3 rounded-full px-4 py-2 backdrop-blur-md">
+          <Link href="/" className="display amber text-xl tracking-[0.28em]">
             {t.brand}
           </Link>
           <nav className="flex flex-wrap items-center gap-2 text-sm">
             <Link href="/inbox" className={onInbox ? 'btn' : 'btn-ghost'}>
               {t.enter}
             </Link>
-            <div className="flex overflow-hidden rounded-full border border-[#f4e6c8]/25">
-              <button
-                type="button"
-                className={`cursor-pointer px-3 py-1 text-xs font-bold ${locale === 'pt' ? 'bg-[#ff7a00] text-black' : ''}`}
-                onClick={() => setLocale('pt')}
-              >
+            <div className="seg" role="group" aria-label={t.theme}>
+              <button type="button" className={theme === 'dark' ? 'on' : ''} onClick={() => setTheme('dark')}>
+                {t.dark}
+              </button>
+              <button type="button" className={theme === 'light' ? 'on' : ''} onClick={() => setTheme('light')}>
+                {t.light}
+              </button>
+            </div>
+            <div className="seg" role="group" aria-label="Idioma">
+              <button type="button" className={locale === 'pt' ? 'on' : ''} onClick={() => setLocale('pt')}>
                 PT
               </button>
-              <button
-                type="button"
-                className={`cursor-pointer px-3 py-1 text-xs font-bold ${locale === 'en' ? 'bg-[#ff7a00] text-black' : ''}`}
-                onClick={() => setLocale('en')}
-              >
+              <button type="button" className={locale === 'en' ? 'on' : ''} onClick={() => setLocale('en')}>
                 EN
               </button>
             </div>
@@ -51,15 +53,15 @@ export function SiteChrome({ children }: { children: ReactNode }) {
         {children}
       </motion.main>
 
-      <footer className="mx-auto mt-8 w-[min(1280px,calc(100%-1.5rem))] border-t border-[#f4e6c8]/10 py-10 text-center text-sm text-[#f4e6c8]/70">
-        <p className="display text-lg tracking-[0.28em] text-[#ffaa00]">{t.brand}</p>
+      <footer className="mx-auto mt-8 w-[min(1280px,calc(100%-1.5rem))] border-t py-10 text-center text-sm muted" style={{ borderColor: 'var(--line)' }}>
+        <p className="display amber text-lg tracking-[0.28em]">{t.brand}</p>
         <p className="mt-2">{t.tagline}</p>
         <p className="mt-4">{t.developed}</p>
         <p className="mt-2 flex justify-center gap-4">
-          <a href="https://ividi.dev/" className="text-[#ff7a00] hover:text-[#ffaa00]">
+          <a href="https://ividi.dev/" className="amber hover:opacity-80">
             ividi.dev
           </a>
-          <a href="https://github.com/VidiPT89/" className="text-[#ff7a00] hover:text-[#ffaa00]">
+          <a href="https://github.com/VidiPT89/" className="amber hover:opacity-80">
             GitHub
           </a>
         </p>

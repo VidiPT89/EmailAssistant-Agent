@@ -6,14 +6,14 @@ import Link from 'next/link'
 
 export function Landing() {
   const { t } = useLocale()
-  const feats = [t.featOauth, t.featClass, t.featTone, t.featPrio, t.featTools]
+  const feats = [t.featOauth, t.featClass, t.featTone, t.featPrio, t.featTools, t.featTheme]
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
       <div>
-        <h1 className="display text-6xl leading-none tracking-[-0.03em] text-[#ffaa00] sm:text-7xl">{t.brand}</h1>
-        <p className="mt-4 text-2xl text-[#f4e6c8]">{t.product}</p>
-        <p className="mt-5 max-w-[42rem] text-lg leading-relaxed text-[#f4e6c8]/80">{t.heroLead}</p>
+        <h1 className="display amber text-6xl leading-none tracking-[-0.03em] sm:text-7xl">{t.brand}</h1>
+        <p className="mt-4 text-2xl">{t.product}</p>
+        <p className="muted mt-5 max-w-[42rem] text-lg leading-relaxed">{t.heroLead}</p>
         <div className="filament mt-8" />
         <Link href="/inbox" className="btn mt-8 inline-block">
           {t.enter}
@@ -28,8 +28,8 @@ export function Landing() {
           className="sheet relative space-y-3 p-8"
         >
           {feats.map((feat) => (
-            <li key={feat} className="flex items-center gap-3 border-b border-[#f4e6c8]/10 py-3 last:border-0">
-              <span className="h-2 w-2 rounded-full bg-[#ff7a00]" />
+            <li key={feat} className="flex items-center gap-3 border-b py-3 last:border-0" style={{ borderColor: 'var(--line)' }}>
+              <span className="h-2 w-2 rounded-full" style={{ background: 'var(--ember)' }} />
               {feat}
             </li>
           ))}

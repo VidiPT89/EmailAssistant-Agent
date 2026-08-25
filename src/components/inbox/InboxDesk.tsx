@@ -2,8 +2,10 @@
 
 import { useLocale } from '@/i18n/LocaleProvider'
 import type { Dictionary } from '@/i18n/dictionaries'
+import { countByLabel, filterTray, type TrayFilter } from '@/lib/filter'
 import type { Label, MailItem, Priority, Tone } from '@/lib/types'
 import { TONES } from '@/lib/types'
+import { formatWhen } from '@/lib/when'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -14,6 +16,8 @@ type Payload = {
   connected: boolean
   liveModel: boolean
 }
+
+const FILTERS: TrayFilter[] = ['all', 'urgent', 'commercial', 'spam', 'general']
 
 function stamp(t: Dictionary, label: Label) {
   return t[label]
@@ -32,6 +36,8 @@ export function InboxDesk() {
   const [busy, setBusy] = useState(false)
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState('')
+  const [query, setQuery] = useState('')
+  const [filter, setFilter] = useState<TrayFilter>('all')
 
   const load = useCallback(async () => {
     const res = await fetch('/api/mail')
@@ -44,9 +50,23 @@ export function InboxDesk() {
     void load()
   }, [load])
 
+  useEffect(() => {
+    const stored = localStorage.getItem('selo-tone')
+    if (stored && TONES.includes(stored as Tone)) setTone(stored as Tone)
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('selo-tone', tone)
+  }, [tone])
+
+  const counts = useMemo(() => countByLabel(data?.items ?? []), [data])
+  const visible = useMemo(
+    () => filterTray(data?.items ?? [], query, filter),
+    [data, query, filter],
+  )
   const mail = useMemo(
-    () => data?.items.find((item) => item.id === selected) ?? null,
-    [data, selected],
+    () => data?.items.find((item) => item.id === selected) ?? visible[0] ?? null,
+    [data, selected, visible],
   )
 
   async function act(action: 'classify' | 'draft' | 'priority') {
@@ -87,8 +107,8 @@ export function InboxDesk() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="display text-4xl tracking-[-0.03em] text-[#ffaa00]">{t.inbox}</h1>
-          <p className="mt-2 max-w-2xl text-sm text-[#f4e6c8]/70">{t.oauthHint}</p>
+          <h1 className="display amber text-4xl tracking-[-0.03em]">{t.inbox}</h1>
+          <p className="muted mt-2 max-w-2xl text-sm">{t.oauthHint}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="stamp">{data?.connected ? t.liveMode : t.demoMode}</span>
@@ -106,16 +126,38 @@ export function InboxDesk() {
         </div>
       </div>
 
+      <div className="flex flex-wrap items-center gap-2">
+        {FILTERS.map((item) => (
+          <button
+            key={item}
+            type="button"
+            className={filter === item ? 'btn' : 'btn-ghost'}
+            onClick={() => setFilter(item)}
+          >
+            {t[item]} {counts[item]}
+          </button>
+        ))}
+        <input
+          className="field max-w-xs"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={t.search}
+          aria-label={t.search}
+        />
+      </div>
+
       <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
         <section className="sheet p-3">
-          {!data?.items.length ? (
-            <p className="p-4 text-[#f4e6c8]/60">{t.noMail}</p>
+          {!data ? (
+            <p className="muted p-4">{t.working}</p>
+          ) : !visible.length ? (
+            <p className="muted p-4">{data.items.length ? t.noMatch : t.noMail}</p>
           ) : (
-            data.items.map((item) => (
+            visible.map((item) => (
               <button
                 key={item.id}
                 type="button"
-                className={`row ${item.id === selected ? 'active' : ''}`}
+                className={`row ${item.id === mail?.id ? 'active' : ''}`}
                 onClick={() => {
                   setSelected(item.id)
                   setDraft('')
@@ -123,10 +165,14 @@ export function InboxDesk() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <p className="font-semibold">{item.from.split('<')[0]}</p>
-                  <span className="stamp">{stamp(t, item.label)}</span>
+                  <span className={`stamp ${item.label}`}>{stamp(t, item.label)}</span>
                 </div>
-                <p className="mt-1 text-sm text-[#ffaa00]">{item.subject}</p>
-                <p className="mt-1 line-clamp-2 text-sm text-[#f4e6c8]/65">{item.snippet}</p>
+                <p className="amber mt-1 text-sm">{item.subject}</p>
+                <p className="muted mt-1 line-clamp-2 text-sm">{item.snippet}</p>
+                <p className="faint mt-2 text-xs">
+                  {formatWhen(item.date, locale)}
+                  {item.starred ? ` · ${t.starred}` : ''}
+                </p>
               </button>
             ))
           )}
@@ -142,24 +188,25 @@ export function InboxDesk() {
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
               >
-                <p className="text-xs uppercase tracking-[0.18em] text-[#f4e6c8]/50">{t.from}</p>
+                <p className="faint text-xs uppercase tracking-[0.18em]">{t.from}</p>
                 <p className="mt-1">{mail.from}</p>
-                <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#f4e6c8]/50">{t.subject}</p>
-                <h2 className="display mt-1 text-3xl text-[#ffaa00]">{mail.subject}</h2>
+                <p className="faint mt-4 text-xs uppercase tracking-[0.18em]">{t.subject}</p>
+                <h2 className="display amber mt-1 text-3xl">{mail.subject}</h2>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="stamp">{stamp(t, mail.label)}</span>
+                  <span className={`stamp ${mail.label}`}>{stamp(t, mail.label)}</span>
                   <span className="stamp">
                     {t.priority}: {prio(t, mail.priority)}
                   </span>
+                  <span className="faint text-xs self-center">{formatWhen(mail.date, locale)}</span>
                 </div>
                 <div className="filament my-5" />
-                <p className="whitespace-pre-wrap leading-relaxed text-[#f4e6c8]/85">{mail.body}</p>
+                <p className="whitespace-pre-wrap leading-relaxed">{mail.body}</p>
 
-                <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <label className="text-sm">
-                    {t.tone}
+                <div className="actions mt-6">
+                  <label className="tone">
+                    <span>{t.tone}</span>
                     <select
-                      className="field ml-2 w-auto cursor-pointer"
+                      className="field cursor-pointer"
                       value={tone}
                       onChange={(event) => setTone(event.target.value as Tone)}
                     >
@@ -180,11 +227,11 @@ export function InboxDesk() {
                     {t.apply}
                   </button>
                 </div>
-                {error ? <p className="mt-3 text-sm text-[#ffaa00]">{error}</p> : null}
+                {error ? <p className="amber mt-3 text-sm">{error}</p> : null}
                 {draft ? (
                   <div className="mt-6">
                     <div className="flex items-center justify-between">
-                      <p className="text-xs uppercase tracking-[0.18em] text-[#f4e6c8]/50">{t.reply}</p>
+                      <p className="faint text-xs uppercase tracking-[0.18em]">{t.reply}</p>
                       <button type="button" className="btn-ghost" onClick={() => void copyDraft()}>
                         {copied ? t.copied : t.copy}
                       </button>
@@ -194,7 +241,7 @@ export function InboxDesk() {
                 ) : null}
               </motion.div>
             ) : (
-              <p className="text-[#f4e6c8]/60">{t.empty}</p>
+              <p className="muted">{t.empty}</p>
             )}
           </AnimatePresence>
         </section>

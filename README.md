@@ -4,7 +4,7 @@
 
 [🐞 Report Bug](https://github.com/VidiPT89/EmailAssistant-Agent/issues) · [✨ Request Feature](https://github.com/VidiPT89/EmailAssistant-Agent/issues)
 
-SELO is a Next.js desk for your inbox. Connect Gmail with OAuth, or work on the sample tray. Each message is classified (urgent, commercial, spam or general), priority is stamped, and a reply is drafted through tools. The UI is European Portuguese / English, with the language toggle remembered in `localStorage`.
+SELO is a Next.js desk for your inbox. Connect Gmail with OAuth, or work on the sample tray. Each message is classified (urgent, commercial, spam or general), priority is stamped, and a reply is drafted through tools. The UI is European Portuguese / English, with language and dark / light theme toggles remembered in `localStorage`. Light mode keeps the same ividi.dev palette on cream paper.
 
 Without Google OAuth keys the sample tray still runs. Without a model key, classification and drafts use local tools so the desk works on a laptop.
 
@@ -16,6 +16,8 @@ Without Google OAuth keys the sample tray still runs. Without a model key, class
 - ⭐ **Priority stamps** — high, medium, low (starred when high)
 - 🛠️ **Tools** — classify, set priority, draft reply
 - 🌍 **PT / EN toggle** — remembered in `localStorage`
+- 🌓 **Dark / light** — same burnt orange and amber, cream paper in light mode
+- 🔎 **Search and filters** — urgent, commercial, spam or general
 - 🎬 **Motion** — ember glow, wax-seal stack and tray reveal
 
 ## 🛠️ Technologies
@@ -73,10 +75,11 @@ To use a hosted model, set `GROQ_API_KEY` or `GOOGLE_GENERATIVE_AI_API_KEY` (or 
 
 ## 📖 Usage
 
-1. Toggle **PT** or **EN** in the header.
+1. Toggle **PT** or **EN**, and **Dark** or **Light**, in the header.
 2. Open the tray. Use the sample messages, or connect Gmail.
-3. Pick a message, choose a tone, then classify, suggest a reply or stamp priority.
-4. Copy the draft into Gmail when you are ready to send.
+3. Filter by stamp or search, then pick a message.
+4. Choose a tone, then classify, suggest a reply or stamp priority.
+5. Copy the draft into Gmail when you are ready to send.
 
 ## 🔌 API Endpoints
 
@@ -94,7 +97,7 @@ To use a hosted model, set `GROQ_API_KEY` or `GOOGLE_GENERATIVE_AI_API_KEY` (or 
 npm test
 ```
 
-`node:test` checks classification, priority stamps, local drafts per tone and secret guards.
+`node:test` checks classification, priority stamps, local drafts per tone, theme parsing, tray filters and relative times.
 
 ## 📄 License
 
