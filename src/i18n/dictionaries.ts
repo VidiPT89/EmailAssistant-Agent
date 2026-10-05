@@ -23,6 +23,13 @@ export const dictionaries = {
     liveModel: 'Modelo ligado',
     oauthHint:
       'Sem Client ID do Google, o SELO corre na bandeja de exemplo. Sem chave de modelo, a classificação e o rascunho usam tools locais.',
+    oauthReadyHint:
+      'O Google já está configurado. Clica Ligar Gmail, marca as duas caixas de permissão e só depois Continuar. Sem as caixas ficas na bandeja de exemplo.',
+    connectedHint:
+      'Gmail ligado. Sem chave de modelo, a classificação e o rascunho usam tools locais.',
+    gmailDenied:
+      'O Google não deu acesso ao Gmail. Volta a Ligar Gmail e marca as duas caixas antes de Continuar.',
+    gmailFail: 'O login chegou, mas não consegui guardar a sessão. Tenta Ligar Gmail outra vez.',
     classify: 'Classificar',
     draft: 'Sugerir resposta',
     apply: 'Marcar prioridade',
@@ -79,6 +86,13 @@ export const dictionaries = {
     liveModel: 'Model on',
     oauthHint:
       'Without a Google Client ID, SELO runs on the sample tray. Without a model key, classification and drafts use local tools.',
+    oauthReadyHint:
+      'Google is already configured. Click Connect Gmail, tick both permission boxes, then Continue. Without the boxes you stay on the sample tray.',
+    connectedHint:
+      'Gmail is connected. Without a model key, classification and drafts use local tools.',
+    gmailDenied:
+      'Google did not grant Gmail access. Connect Gmail again and tick both boxes before Continue.',
+    gmailFail: 'Login reached the app, but the session could not be saved. Try Connect Gmail again.',
     classify: 'Classify',
     draft: 'Suggest reply',
     apply: 'Stamp priority',

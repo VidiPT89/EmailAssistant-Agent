@@ -5,6 +5,7 @@ import type { Dictionary } from '@/i18n/dictionaries'
 import { countByLabel, filterTray, type TrayFilter } from '@/lib/filter'
 import type { Label, MailItem, Priority, Tone } from '@/lib/types'
 import { TONES } from '@/lib/types'
+import { useQueryFlag, useStoredChoice } from '@/lib/stored-choice'
 import { formatWhen } from '@/lib/when'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -27,11 +28,16 @@ function prio(t: Dictionary, priority: Priority) {
   return t[priority]
 }
 
+async function fetchMail(): Promise<Payload> {
+  const res = await fetch('/api/mail')
+  return (await res.json()) as Payload
+}
+
 export function InboxDesk() {
   const { t, locale } = useLocale()
   const [data, setData] = useState<Payload | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
-  const [tone, setTone] = useState<Tone>('formal')
+  const [tone, setTone] = useStoredChoice<Tone>('selo-tone', TONES, 'formal')
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -39,25 +45,30 @@ export function InboxDesk() {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<TrayFilter>('all')
 
-  const load = useCallback(async () => {
-    const res = await fetch('/api/mail')
-    const json = (await res.json()) as Payload
+  const gmailFlag = useQueryFlag('gmail')
+  const gmailNote = gmailFlag === 'denied' ? t.gmailDenied : gmailFlag === 'fail' ? t.gmailFail : ''
+
+  const apply = useCallback((json: Payload) => {
     setData(json)
     setSelected((prev) => prev ?? json.items[0]?.id ?? null)
   }, [])
 
   useEffect(() => {
-    void load()
-  }, [load])
+    let ignore = false
+    fetchMail()
+      .then((json) => {
+        if (!ignore) apply(json)
+      })
+      .catch(() => {
+        /* offline: the tray stays empty */
+      })
+    return () => {
+      ignore = true
+    }
+  }, [apply])
 
-  useEffect(() => {
-    const stored = localStorage.getItem('selo-tone')
-    if (stored && TONES.includes(stored as Tone)) setTone(stored as Tone)
-  }, [])
+  const hint = data?.connected ? t.connectedHint : data?.oauthReady ? t.oauthReadyHint : t.oauthHint
 
-  useEffect(() => {
-    localStorage.setItem('selo-tone', tone)
-  }, [tone])
 
   const counts = useMemo(() => countByLabel(data?.items ?? []), [data])
   const visible = useMemo(
@@ -108,7 +119,8 @@ export function InboxDesk() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="display amber text-4xl tracking-[-0.03em]">{t.inbox}</h1>
-          <p className="muted mt-2 max-w-2xl text-sm">{t.oauthHint}</p>
+          <p className="muted mt-2 max-w-2xl text-sm">{hint}</p>
+          {gmailNote ? <p className="amber mt-2 max-w-2xl text-sm">{gmailNote}</p> : null}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="stamp">{data?.connected ? t.liveMode : t.demoMode}</span>
