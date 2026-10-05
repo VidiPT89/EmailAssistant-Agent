@@ -2,6 +2,8 @@
 
 > Bilingual Gmail agent: classify the tray, stamp priority and draft a reply in the tone you pick, painted in the ividi.dev palette (black, burnt orange, amber).
 
+[![CI](https://github.com/VidiPT89/EmailAssistant-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/VidiPT89/EmailAssistant-Agent/actions/workflows/ci.yml)
+
 [🐞 Report Bug](https://github.com/VidiPT89/EmailAssistant-Agent/issues) · [✨ Request Feature](https://github.com/VidiPT89/EmailAssistant-Agent/issues)
 
 SELO is a Next.js desk for your inbox. Connect Gmail with OAuth, or work on the sample tray. Each message is classified (urgent, commercial, spam or general), priority is stamped, and a reply is drafted through tools. The UI is European Portuguese / English, with language and dark / light theme toggles remembered in `localStorage`. Light mode keeps the same ividi.dev palette on cream paper.
