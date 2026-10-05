@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/VidiPT89/EmailAssistant-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/VidiPT89/EmailAssistant-Agent/actions/workflows/ci.yml)
 
-**🌐 Live demo:** [email-assistant-agent-psi.vercel.app](https://email-assistant-agent-psi.vercel.app) · Runs on the sample tray: classify, stamp priority and draft replies with the local tools, no Gmail or model key needed.
+**🌐 Live demo:** [selo.ividi.dev](https://selo.ividi.dev) · Runs on the sample tray: classify, stamp priority and draft replies with the local tools, no Gmail or model key needed.
 
 [🐞 Report Bug](https://github.com/VidiPT89/EmailAssistant-Agent/issues) · [✨ Request Feature](https://github.com/VidiPT89/EmailAssistant-Agent/issues)
 
